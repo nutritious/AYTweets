@@ -37,12 +37,12 @@ public class TwitterClient extends OAuthBaseClient {
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 
     // Production API Keys for @yegorich
-//	public static final String REST_CONSUMER_KEY = "GI1gRzUDeRutEm0CeNqpg09n4";
-//	public static final String REST_CONSUMER_SECRET = "ujgmS5NN0AjSQJ1HlFce5UTlxXnHeXDcjE0qQmcHBTPIWL6WXc";
+	public static final String REST_CONSUMER_KEY = "GI1gRzUDeRutEm0CeNqpg09n4";
+	public static final String REST_CONSUMER_SECRET = "ujgmS5NN0AjSQJ1HlFce5UTlxXnHeXDcjE0qQmcHBTPIWL6WXc";
 
     // Staging API keys for @grouponicus
-    public static final String REST_CONSUMER_KEY = "M0J2XeC9aEwlcBRiJOJsKsjpe";
-    public static final String REST_CONSUMER_SECRET = "KFl7ZFPlROku9RZ8ZY5WJmu07TLQDtvwbLuq7KprOLaX3j7wtc";
+//    public static final String REST_CONSUMER_KEY = "M0J2XeC9aEwlcBRiJOJsKsjpe";
+//    public static final String REST_CONSUMER_SECRET = "KFl7ZFPlROku9RZ8ZY5WJmu07TLQDtvwbLuq7KprOLaX3j7wtc";
 
     // Q: How do I know what to put after oauth:// ?
 	public static final String REST_CALLBACK_URL = "oauth://cpaytweets"; // Change this (here and in manifest)

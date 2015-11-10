@@ -93,7 +93,7 @@ public class TimelineActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(ArrayList<Tweet> tweets) {
                         if (tweets.size() > 0) {
-                            tweets.addAll(0, tweets);
+                            TimelineActivity.this.tweets.addAll(0, tweets);
                             // TODO: we need to handle gap situation here
                             tweetsTimelineAdapter.notifyDataSetChanged();
                         }
