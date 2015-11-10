@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AY Tweets</string>
+    <string name="login_label">Connect to Twitter</string>
+    <string name="title_activity_timeline">Home Timeline</string>
+    <string name="timeline_item_username_desription">user name goes here</string>
+    <string name="timeline_item_tweet_body_description">tweet body goes here</string>
+    <string name="timeline_item_timestamp_description">tweet time stamp goes here</string>
+    <string name="timeline_item_user_image_description">user image goes here</string>
+    <string name="timeline_item_tweet_timestamp_description">tweet time goes here</string>
+    <string name="compose_tweet_title">New Tweet</string>
+    <string name="tweet_button_title">Tweet</string>
+    <string name="tweet_edit_text_hint">What\'s on your mind?</string>
+    <string name="tweet_action_bar_title">Compose a tweet</string>
+    <string name="tweet_char_countdown_hint">Characters Left</string>
+</resources>

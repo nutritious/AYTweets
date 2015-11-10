@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/userNameTextView"
+        android:contentDescription="@string/timeline_item_username_desription"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/userImageView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/userImageView"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tweetBodyTextView"
+        android:contentDescription="@string/timeline_item_tweet_body_description"
+        android:layout_alignRight="@+id/userNameTextView"
+        android:layout_alignEnd="@+id/userNameTextView"
+        android:layout_below="@+id/userNameTextView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:minLines="1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:autoLink="all"
+        android:linksClickable="true"
+        />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/userImageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="#38bdd5"
+        android:contentDescription="@string/timeline_item_user_image_description"
+        android:layout_margin="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tweetTimestampTextView"
+        android:contentDescription="@string/timeline_item_tweet_timestamp_description"
+        android:minLines="1"
+        android:layout_below="@+id/tweetBodyTextView"
+        android:layout_alignLeft="@+id/tweetBodyTextView"
+        android:layout_alignStart="@+id/tweetBodyTextView"
+        android:layout_alignRight="@+id/userNameTextView"
+        android:layout_alignEnd="@+id/userNameTextView"
+        android:layout_marginBottom="10dp"
+        android:textStyle="italic" />
+</RelativeLayout>
