@@ -143,6 +143,7 @@ public class TwitterClient extends OAuthBaseClient {
     }
 
     public void getHomeTimelineRefresh(final TwitterResponseHandler handler) {
+        // TODO: this one doesn't handle a 'DELETE' case
         getHomeTimelineRefreshAfter(TWEET_PARAM_UNDEFINED, handler);
     }
 

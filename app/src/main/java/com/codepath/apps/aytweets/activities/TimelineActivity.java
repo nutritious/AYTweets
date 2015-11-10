@@ -133,7 +133,6 @@ public class TimelineActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             String tweetBody = data.getStringExtra("tweetBody");
-//            Toast.makeText(TimelineActivity.this, tweetBody, Toast.LENGTH_SHORT).show();
 
             final TwitterClient client = TwitterApplication.getRestClient();
             client.postTweet(tweetBody, new TwitterPostResponseHandler() {
@@ -154,6 +153,11 @@ public class TimelineActivity extends AppCompatActivity {
                             Toast.makeText(TimelineActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     });
+                }
+
+                @Override
+                public void onFailure(int statusCode, String errorMessage) {
+                    Toast.makeText(TimelineActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                 }
             });
         }

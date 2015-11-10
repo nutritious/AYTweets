@@ -53,9 +53,14 @@ public class ComposeTweetActivity extends AppCompatActivity {
     }
 
     public void onTweet(View view) {
-        Intent data = new Intent();
-        data.putExtra("tweetBody", tweetEditText.getText().toString());
-        this.setResult(RESULT_OK, data);
+        String tweetBody = tweetEditText.getText().toString();
+
+        if (tweetBody.length() > 0) {
+            Intent data = new Intent();
+            data.putExtra("tweetBody", tweetBody);
+            this.setResult(RESULT_OK, data);
+        }
+
         this.finish();
     }
 }
