@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.codepath.apps.aytweets.models.Tweet;
+import com.codepath.apps.aytweets.models.User;
 import com.codepath.oauth.OAuthBaseClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -18,6 +19,7 @@ import org.scribe.builder.api.Api;
 import org.scribe.builder.api.TwitterApi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /*
  * 
@@ -33,10 +35,27 @@ import java.util.ArrayList;
  */
 public class TwitterClient extends OAuthBaseClient {
 
+    private class PaginationContext {
+        public long tweetsLastTweetCount;
+        public long tweetsCurrentMaxId;
+        public long tweetsCurrentStartId;
+
+        public PaginationContext() {
+            reset();
+        }
+
+        public void reset() {
+            tweetsLastTweetCount = TWEET_PARAM_UNDEFINED;
+            tweetsCurrentMaxId = TWEET_PARAM_UNDEFINED;
+            tweetsCurrentStartId = TWEET_PARAM_UNDEFINED;
+        }
+
+    }
+
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 
-    // Production API Keys for @yegorich
+    // Production API keys for @yegorich
 	public static final String REST_CONSUMER_KEY = "GI1gRzUDeRutEm0CeNqpg09n4";
 	public static final String REST_CONSUMER_SECRET = "ujgmS5NN0AjSQJ1HlFce5UTlxXnHeXDcjE0qQmcHBTPIWL6WXc";
 
@@ -51,12 +70,18 @@ public class TwitterClient extends OAuthBaseClient {
 
     private static final long TWEET_PARAM_UNDEFINED = -1;
 
-    private long tweetsLastTweetCount = TWEET_PARAM_UNDEFINED;
-    private long tweetsCurrentMaxId = TWEET_PARAM_UNDEFINED;
-    private long tweetsCurrentStartId = TWEET_PARAM_UNDEFINED;
+    private HashMap<TimelineType, PaginationContext> paginationContexts;
+
+//    private long tweetsLastTweetCount = TWEET_PARAM_UNDEFINED;
+//    private long tweetsCurrentMaxId = TWEET_PARAM_UNDEFINED;
+//    private long tweetsCurrentStartId = TWEET_PARAM_UNDEFINED;
 
 	public TwitterClient(Context context) {
 		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+        paginationContexts = new HashMap<>();
+        paginationContexts.put(TimelineType.Home, new PaginationContext());
+        paginationContexts.put(TimelineType.Mentions, new PaginationContext());
+        paginationContexts.put(TimelineType.User, new PaginationContext());
 	}
 
     //
@@ -87,27 +112,45 @@ public class TwitterClient extends OAuthBaseClient {
         errorHandler.onFailure(statusCode, errorMessage);
     }
 
+    private String getTimelineApiUrlForType(TimelineType timelineType) {
+        switch (timelineType) {
+            case Home:
+                return "statuses/home_timeline.json";
+            case Mentions:
+                return "statuses/mentions_timeline.json";
+            case User:
+                return "statuses/user_timeline.json";
+            default:
+                assert (false); // Shouldn't come here
+        }
+
+        return "<undefined>";
+    }
+
     //
     // Interface
     //
 
-    public void getHomeTimelineInitial(final TwitterResponseHandler handler) {
-        tweetsLastTweetCount = TWEET_PARAM_UNDEFINED;
-        tweetsCurrentMaxId = TWEET_PARAM_UNDEFINED;
-        tweetsCurrentStartId = TWEET_PARAM_UNDEFINED;
+    // -- Time family of methods
 
-        getHomeTimeline(TWEET_PARAM_UNDEFINED, TWEET_PARAM_UNDEFINED, new TwitterResponseHandler() {
+    public void getTimelineInitial(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
+
+        final PaginationContext paginationContext = paginationContexts.get(timelineType);
+        paginationContext.reset();
+
+        getTimeline(timelineType, TWEET_PARAM_UNDEFINED, TWEET_PARAM_UNDEFINED, new TwitterTimelineResponseHandler() {
                     @Override
                     public void onSuccess(ArrayList<Tweet> tweets) {
-                        tweetsLastTweetCount = tweets.size();
-                        Log.d("AYTweets.DEBUG", "tweets loaded: " + tweetsLastTweetCount);
+                        paginationContext.tweetsLastTweetCount = tweets.size();
+                        Log.d("AYTweets.DEBUG", "tweets loaded: " + paginationContext.tweetsLastTweetCount);
                         if (tweets.size() > 0) {
-                            tweetsCurrentStartId = tweets.get(0).getTweetId();
-                            tweetsCurrentMaxId = tweets.get(tweets.size() - 1).getTweetId();
+                            paginationContext.tweetsCurrentStartId = tweets.get(0).getTweetId();
+                            paginationContext.tweetsCurrentMaxId = tweets.get(tweets.size() - 1).getTweetId();
                         }
 
                         handler.onSuccess(tweets);
                     }
+
                     @Override
                     public void onFailure(int statusCode, String errorMessage) {
                         handler.onFailure(statusCode, errorMessage);
@@ -116,22 +159,25 @@ public class TwitterClient extends OAuthBaseClient {
         );
     }
 
-    public boolean getHomeTimelineMore(final TwitterResponseHandler handler) {
+    public boolean getTimelineMore(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
         // Note: we could check that we loaded exactly or more of what we had asked, but
         //       in reality twitter gives us less.
-        boolean thereIsMoreToCome = (tweetsLastTweetCount == TWEET_PARAM_UNDEFINED || tweetsLastTweetCount > 0);
+        final PaginationContext paginationContext = paginationContexts.get(timelineType);
+
+        boolean thereIsMoreToCome = (paginationContext.tweetsLastTweetCount == TWEET_PARAM_UNDEFINED || paginationContext.tweetsLastTweetCount > 0);
         if (thereIsMoreToCome) {
-            getHomeTimeline(TWEET_PARAM_UNDEFINED, tweetsCurrentMaxId - 1, new TwitterResponseHandler() {
+            getTimeline(timelineType, TWEET_PARAM_UNDEFINED, paginationContext.tweetsCurrentMaxId - 1, new TwitterTimelineResponseHandler() {
                 @Override
                 public void onSuccess(ArrayList<Tweet> tweets) {
-                    tweetsLastTweetCount = tweets.size();
-                    Log.d("AYTweets.DEBUG", "tweets loaded: " + tweetsLastTweetCount);
+                    paginationContext.tweetsLastTweetCount = tweets.size();
+                    Log.d("AYTweets.DEBUG", "tweets loaded: " + paginationContext.tweetsLastTweetCount);
                     if (tweets.size() > 0) {
-                        tweetsCurrentMaxId = tweets.get(tweets.size() - 1).getTweetId();
+                        paginationContext.tweetsCurrentMaxId = tweets.get(tweets.size() - 1).getTweetId();
                     }
 
                     handler.onSuccess(tweets);
                 }
+
                 @Override
                 public void onFailure(int statusCode, String errorMessage) {
                     handler.onFailure(statusCode, errorMessage);
@@ -142,17 +188,20 @@ public class TwitterClient extends OAuthBaseClient {
         return thereIsMoreToCome;
     }
 
-    public void getHomeTimelineRefresh(final TwitterResponseHandler handler) {
+    public void getTimelineRefresh(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
         // TODO: this one doesn't handle a 'DELETE' case
-        getHomeTimelineRefreshAfter(TWEET_PARAM_UNDEFINED, handler);
+        getTimelineRefreshAfter(timelineType, TWEET_PARAM_UNDEFINED, handler);
     }
 
-    public void getHomeTimelineRefreshAfter(long tweetId, final TwitterResponseHandler handler) {
-        getHomeTimeline(tweetsCurrentStartId, tweetId, new TwitterResponseHandler() {
+    public void getTimelineRefreshAfter(TimelineType timelineType, long tweetId, final TwitterTimelineResponseHandler handler) {
+
+        final PaginationContext paginationContext = paginationContexts.get(timelineType);
+
+        getTimeline(timelineType, paginationContext.tweetsCurrentStartId, tweetId, new TwitterTimelineResponseHandler() {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
                 if (tweets.size() > 0) {
-                    tweetsCurrentStartId = tweets.get(0).getTweetId();
+                    paginationContext.tweetsCurrentStartId = tweets.get(0).getTweetId();
                 }
 
                 handler.onSuccess(tweets);
@@ -165,9 +214,9 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
-    public void getHomeTimeline(long sinceId, long maxId, final TwitterResponseHandler handler) {
+    public void getTimeline(TimelineType timelineType, long sinceId, long maxId, final TwitterTimelineResponseHandler handler) {
 
-		String apiUrl = getApiUrl("statuses/home_timeline.json");
+		String apiUrl = getApiUrl(getTimelineApiUrlForType(timelineType));
 
         RequestParams params = new RequestParams();
         if (sinceId != TWEET_PARAM_UNDEFINED) {
@@ -203,6 +252,7 @@ public class TwitterClient extends OAuthBaseClient {
             }
 	}
 
+    // -- Post a tweet
     public void postTweet(String body, final TwitterPostResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/update.json");
 
@@ -217,6 +267,31 @@ public class TwitterClient extends OAuthBaseClient {
                     handler.onSuccess(tweetId);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
+            }
+        });
+    }
+
+    // -- User profile
+
+    public void getUserProfile(final TwitterAccountResponseHandler handler) {
+        String apiUrl = getApiUrl("account/verify_credentials");
+
+        RequestParams params = new RequestParams();
+        getClient().get(apiUrl, params, new JsonHttpResponseHandler() {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
+                Log.d("AYTweets.DEBUG", "GET account response: " + jsonObject.toString());
+                User user = new User(jsonObject);
+
+                if (user != null) {
+                    handler.onSuccess(user);
+                } else {
+                    handler.onFailure(-1, "couldn't create user object from JSON");
                 }
             }
 

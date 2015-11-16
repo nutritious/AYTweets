@@ -45,6 +45,21 @@ public class User extends Model {
     private String name;
     private String userId;
     private String profileImageUrl;
+    private String tagline;
+    private int followersCount;
+    private int friendsCount;
+
+    public String getTagline() {
+        return tagline;
+    }
+
+    public int getFollowersCount() {
+        return followersCount;
+    }
+
+    public int getFriendsCount() {
+        return friendsCount;
+    }
 
     public String getName() {
         return name;
@@ -64,6 +79,9 @@ public class User extends Model {
             userId = jsonObject.getString("id_str");
             name = jsonObject.getString("name");
             profileImageUrl = jsonObject.getString("profile_image_url");
+            tagline = jsonObject.getString("description");
+            friendsCount = jsonObject.getInt("friends_count");
+            followersCount = jsonObject.getInt("followers_count");
         } catch (JSONException e) {
             e.printStackTrace();
         }

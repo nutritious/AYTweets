@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by ayegorov on 11/9/15.
  */
-public class TwitterResponseHandler implements TwitterErrorHandler {
+public class TwitterTimelineResponseHandler implements TwitterErrorHandler {
 
     public void onSuccess(ArrayList<Tweet> tweets) {
         Log.w("AYTweets.DEBUG", "got the tweets: " + tweets);

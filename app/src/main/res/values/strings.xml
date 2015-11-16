@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">AY Tweets</string>
     <string name="login_label">Connect to Twitter</string>
-    <string name="title_activity_timeline">Home Timeline</string>
+    <string name="title_activity_timeline_home">Home Timeline</string>
     <string name="timeline_item_username_desription">user name goes here</string>
     <string name="timeline_item_tweet_body_description">tweet body goes here</string>
     <string name="timeline_item_timestamp_description">tweet time stamp goes here</string>
