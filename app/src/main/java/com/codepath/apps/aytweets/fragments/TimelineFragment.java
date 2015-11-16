@@ -14,17 +14,20 @@ import java.util.ArrayList;
  */
 public class TimelineFragment extends TimelineFragmentBase {
 
-    public static TimelineFragment newInstance(TimelineType timelineType) {
+    private Bundle extraParams;
+
+    public static TimelineFragment newInstance(TimelineType timelineType, Bundle extraParams) {
         Bundle args = new Bundle();
         args.putInt("Type", timelineType.ordinal());
         TimelineFragment fragment = new TimelineFragment();
         fragment.setArguments(args);
+        fragment.extraParams = extraParams;
         return fragment;
     }
 
     @Override
     public void fetchTimelineInitial() {
-        client.getTimelineInitial(timelineType, new TwitterTimelineResponseHandler()
+        client.getTimelineInitial(timelineType, extraParams, new TwitterTimelineResponseHandler()
         {
             @Override
             public void onSuccess(ArrayList<Tweet> newTweets) {
@@ -42,7 +45,7 @@ public class TimelineFragment extends TimelineFragmentBase {
 
     @Override
     public boolean fetchTimelineMore() {
-        return client.getTimelineMore(timelineType, new TwitterTimelineResponseHandler()
+        return client.getTimelineMore(timelineType, extraParams, new TwitterTimelineResponseHandler()
         {
             @Override
             public void onSuccess(ArrayList<Tweet> newTweets) {
@@ -62,7 +65,7 @@ public class TimelineFragment extends TimelineFragmentBase {
         // Your code to refresh the list here.
         // Make sure you call swipeContainer.setRefreshing(false)
         // once the network request has completed successfully.
-        client.getTimelineRefresh(timelineType, new TwitterTimelineResponseHandler() {
+        client.getTimelineRefresh(timelineType, extraParams, new TwitterTimelineResponseHandler() {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
                 if (tweets.size() > 0) {
@@ -84,7 +87,7 @@ public class TimelineFragment extends TimelineFragmentBase {
 
     @Override
     public void fetchTimelineRefreshAfterTweet(long tweetId) {
-        client.getTimelineRefreshAfter(timelineType, tweetId, new TwitterTimelineResponseHandler() {
+        client.getTimelineRefreshAfter(timelineType, tweetId, extraParams, new TwitterTimelineResponseHandler() {
             @Override
             public void onSuccess(ArrayList<Tweet> newTweets) {
                 if (newTweets.size() > 0) {

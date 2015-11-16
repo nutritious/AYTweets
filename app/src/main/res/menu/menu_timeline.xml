@@ -9,5 +9,12 @@
         android:onClick="onComposeTweet"
         android:orderInCategory="100"
         android:title="@string/compose_tweet_title"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_user_profile"
+        android:icon="@drawable/ic_profile"
+        android:onClick="onUserProfile"
+        android:orderInCategory="101"
+        android:title="@string/user_profile_title"
+        app:showAsAction="ifRoom" />
 </menu>

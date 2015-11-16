@@ -13,4 +13,9 @@
     <string name="tweet_edit_text_hint">What\'s on your mind?</string>
     <string name="tweet_action_bar_title">Compose a tweet</string>
     <string name="tweet_char_countdown_hint">Characters Left</string>
+    <string name="user_profile_title">Profile</string>
+    <string name="name_profile_hint">name goes here</string>
+    <string name="profile_tagline_hint">tagline goes here</string>
+    <string name="profile_followers_hint">## Followers</string>
+    <string name="profile_following_hint">## Following</string>
 </resources>

@@ -3,6 +3,7 @@ package com.codepath.apps.aytweets.network;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.codepath.apps.aytweets.models.Tweet;
@@ -35,6 +36,9 @@ import java.util.HashMap;
  */
 public class TwitterClient extends OAuthBaseClient {
 
+    private static final long TWEET_PARAM_UNDEFINED = -1;
+    public static final int PAGE_SIZE = 25;
+
     private class PaginationContext {
         public long tweetsLastTweetCount;
         public long tweetsCurrentMaxId;
@@ -52,37 +56,29 @@ public class TwitterClient extends OAuthBaseClient {
 
     }
 
-	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
-	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
+    public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
+    public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 
     // Production API keys for @yegorich
-	public static final String REST_CONSUMER_KEY = "GI1gRzUDeRutEm0CeNqpg09n4";
-	public static final String REST_CONSUMER_SECRET = "ujgmS5NN0AjSQJ1HlFce5UTlxXnHeXDcjE0qQmcHBTPIWL6WXc";
+    public static final String REST_CONSUMER_KEY = "GI1gRzUDeRutEm0CeNqpg09n4";
+    public static final String REST_CONSUMER_SECRET = "ujgmS5NN0AjSQJ1HlFce5UTlxXnHeXDcjE0qQmcHBTPIWL6WXc";
 
     // Staging API keys for @grouponicus
 //    public static final String REST_CONSUMER_KEY = "M0J2XeC9aEwlcBRiJOJsKsjpe";
 //    public static final String REST_CONSUMER_SECRET = "KFl7ZFPlROku9RZ8ZY5WJmu07TLQDtvwbLuq7KprOLaX3j7wtc";
 
     // Q: How do I know what to put after oauth:// ?
-	public static final String REST_CALLBACK_URL = "oauth://cpaytweets"; // Change this (here and in manifest)
-
-    public static final int PAGE_SIZE = 25;
-
-    private static final long TWEET_PARAM_UNDEFINED = -1;
+    public static final String REST_CALLBACK_URL = "oauth://cpaytweets"; // Change this (here and in manifest)
 
     private HashMap<TimelineType, PaginationContext> paginationContexts;
 
-//    private long tweetsLastTweetCount = TWEET_PARAM_UNDEFINED;
-//    private long tweetsCurrentMaxId = TWEET_PARAM_UNDEFINED;
-//    private long tweetsCurrentStartId = TWEET_PARAM_UNDEFINED;
-
-	public TwitterClient(Context context) {
-		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+    public TwitterClient(Context context) {
+        super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
         paginationContexts = new HashMap<>();
         paginationContexts.put(TimelineType.Home, new PaginationContext());
         paginationContexts.put(TimelineType.Mentions, new PaginationContext());
         paginationContexts.put(TimelineType.User, new PaginationContext());
-	}
+    }
 
     //
     // Private Helpers
@@ -131,14 +127,14 @@ public class TwitterClient extends OAuthBaseClient {
     // Interface
     //
 
-    // -- Time family of methods
+    // -- Timeline family of methods
 
-    public void getTimelineInitial(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
+    public void getTimelineInitial(TimelineType timelineType, Bundle extraParams, final TwitterTimelineResponseHandler handler) {
 
         final PaginationContext paginationContext = paginationContexts.get(timelineType);
         paginationContext.reset();
 
-        getTimeline(timelineType, TWEET_PARAM_UNDEFINED, TWEET_PARAM_UNDEFINED, new TwitterTimelineResponseHandler() {
+        getTimeline(timelineType, TWEET_PARAM_UNDEFINED, TWEET_PARAM_UNDEFINED, extraParams, new TwitterTimelineResponseHandler() {
                     @Override
                     public void onSuccess(ArrayList<Tweet> tweets) {
                         paginationContext.tweetsLastTweetCount = tweets.size();
@@ -159,14 +155,14 @@ public class TwitterClient extends OAuthBaseClient {
         );
     }
 
-    public boolean getTimelineMore(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
+    public boolean getTimelineMore(TimelineType timelineType, Bundle extraParams, final TwitterTimelineResponseHandler handler) {
         // Note: we could check that we loaded exactly or more of what we had asked, but
         //       in reality twitter gives us less.
         final PaginationContext paginationContext = paginationContexts.get(timelineType);
 
         boolean thereIsMoreToCome = (paginationContext.tweetsLastTweetCount == TWEET_PARAM_UNDEFINED || paginationContext.tweetsLastTweetCount > 0);
         if (thereIsMoreToCome) {
-            getTimeline(timelineType, TWEET_PARAM_UNDEFINED, paginationContext.tweetsCurrentMaxId - 1, new TwitterTimelineResponseHandler() {
+            getTimeline(timelineType, TWEET_PARAM_UNDEFINED, paginationContext.tweetsCurrentMaxId - 1, extraParams, new TwitterTimelineResponseHandler() {
                 @Override
                 public void onSuccess(ArrayList<Tweet> tweets) {
                     paginationContext.tweetsLastTweetCount = tweets.size();
@@ -188,16 +184,16 @@ public class TwitterClient extends OAuthBaseClient {
         return thereIsMoreToCome;
     }
 
-    public void getTimelineRefresh(TimelineType timelineType, final TwitterTimelineResponseHandler handler) {
+    public void getTimelineRefresh(TimelineType timelineType, Bundle extraParams, final TwitterTimelineResponseHandler handler) {
         // TODO: this one doesn't handle a 'DELETE' case
-        getTimelineRefreshAfter(timelineType, TWEET_PARAM_UNDEFINED, handler);
+        getTimelineRefreshAfter(timelineType, TWEET_PARAM_UNDEFINED, extraParams, handler);
     }
 
-    public void getTimelineRefreshAfter(TimelineType timelineType, long tweetId, final TwitterTimelineResponseHandler handler) {
+    public void getTimelineRefreshAfter(TimelineType timelineType, long tweetId, Bundle extraParams, final TwitterTimelineResponseHandler handler) {
 
         final PaginationContext paginationContext = paginationContexts.get(timelineType);
 
-        getTimeline(timelineType, paginationContext.tweetsCurrentStartId, tweetId, new TwitterTimelineResponseHandler() {
+        getTimeline(timelineType, paginationContext.tweetsCurrentStartId, tweetId, extraParams, new TwitterTimelineResponseHandler() {
             @Override
             public void onSuccess(ArrayList<Tweet> tweets) {
                 if (tweets.size() > 0) {
@@ -214,9 +210,9 @@ public class TwitterClient extends OAuthBaseClient {
         });
     }
 
-    public void getTimeline(TimelineType timelineType, long sinceId, long maxId, final TwitterTimelineResponseHandler handler) {
+    public void getTimeline(TimelineType timelineType, long sinceId, long maxId, Bundle extraParams, final TwitterTimelineResponseHandler handler) {
 
-		String apiUrl = getApiUrl(getTimelineApiUrlForType(timelineType));
+        String apiUrl = getApiUrl(getTimelineApiUrlForType(timelineType));
 
         RequestParams params = new RequestParams();
         if (sinceId != TWEET_PARAM_UNDEFINED) {
@@ -228,29 +224,37 @@ public class TwitterClient extends OAuthBaseClient {
 
         params.put("count", PAGE_SIZE);
 
-            try {
-                // This guy throws when there is OAuth token
-                getClient().get(apiUrl, params, new JsonHttpResponseHandler() {
-                    public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
-                        Log.d("AYTweets.DEBUG", "timeline: " + jsonArray.toString());
-                        ArrayList<Tweet> tweets = Tweet.fromJson(jsonArray);
-                        handler.onSuccess(tweets);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                        TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
-                        TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
+        // Put any extra parameters if needed
+        if (extraParams != null) {
+            for (String key : extraParams.keySet()) {
+                Object value = extraParams.get(key);
+                params.put(key, value);
             }
-	}
+        }
+
+        try {
+            // This guy throws when there is OAuth token
+            getClient().get(apiUrl, params, new JsonHttpResponseHandler() {
+                public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
+                    Log.d("AYTweets.DEBUG", "timeline: " + jsonArray.toString());
+                    ArrayList<Tweet> tweets = Tweet.fromJson(jsonArray);
+                    handler.onSuccess(tweets);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                    TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     // -- Post a tweet
     public void postTweet(String body, final TwitterPostResponseHandler handler) {
@@ -280,7 +284,7 @@ public class TwitterClient extends OAuthBaseClient {
     // -- User profile
 
     public void getUserProfile(final TwitterAccountResponseHandler handler) {
-        String apiUrl = getApiUrl("account/verify_credentials");
+        String apiUrl = getApiUrl("account/verify_credentials.json");
 
         RequestParams params = new RequestParams();
         getClient().get(apiUrl, params, new JsonHttpResponseHandler() {
@@ -298,6 +302,11 @@ public class TwitterClient extends OAuthBaseClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 TwitterClient.this.handleOnFailure(statusCode, handler, errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                TwitterClient.this.handleOnFailure(statusCode, handler, responseString);
             }
         });
     }

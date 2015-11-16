@@ -1,6 +1,7 @@
 package com.codepath.apps.aytweets.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.codepath.apps.aytweets.R;
+import com.codepath.apps.aytweets.activities.ProfileActivity;
 import com.codepath.apps.aytweets.models.Tweet;
 import com.squareup.picasso.Picasso;
 
@@ -33,7 +35,7 @@ public class TweetsTimelineAdapter extends ArrayAdapter<Tweet> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Tweet tweet = getItem(position);
+        final Tweet tweet = getItem(position);
         ViewHolder viewHolder = null;
 
         if (convertView == null) {
@@ -41,7 +43,7 @@ public class TweetsTimelineAdapter extends ArrayAdapter<Tweet> {
             convertView = layoutInflater.inflate(R.layout.timeline_item, parent, false);
 
             viewHolder = new ViewHolder();
-            viewHolder.userImageView = (ImageView)convertView.findViewById(R.id.userImageView);
+            viewHolder.userImageView = (ImageView)convertView.findViewById(R.id.profileUserImageView);
             viewHolder.userNameTextView = (TextView)convertView.findViewById(R.id.userNameTextView);
             viewHolder.tweetBodyTextView = (TextView)convertView.findViewById(R.id.tweetBodyTextView);
             viewHolder.tweetTimestampTextView = (TextView)convertView.findViewById(R.id.tweetTimestampTextView);
@@ -52,6 +54,16 @@ public class TweetsTimelineAdapter extends ArrayAdapter<Tweet> {
         }
 
         viewHolder.userImageView.setImageResource(0);
+
+        viewHolder.userImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ProfileActivity.class);
+                intent.putExtra("user", tweet.getUser());
+                getContext().startActivity(intent);
+            }
+        });
+
         Picasso.with(getContext()).load(tweet.getUser().getProfileImageUrl()).into(viewHolder.userImageView);
         viewHolder.tweetBodyTextView.setText(tweet.getBody());
         viewHolder.userNameTextView.setText(tweet.getUser().getName());

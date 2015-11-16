@@ -5,6 +5,8 @@ import com.activeandroid.Model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by ayegorov on 11/8/15.
  */
@@ -39,18 +41,20 @@ import org.json.JSONObject;
         "description": null
       },
  */
-public class User extends Model {
+public class User extends Model implements Serializable {
 
     // Q: Is it a requirement / good idea for some reason to make these private?
     private String name;
+    private String twitterTag;
     private String userId;
     private String profileImageUrl;
+    private String originalProfileImageUrl;
     private String tagline;
     private int followersCount;
     private int friendsCount;
 
     public String getTagline() {
-        return tagline;
+        return (tagline.length() > 0 ? tagline : "No tagline");
     }
 
     public int getFollowersCount() {
@@ -73,17 +77,38 @@ public class User extends Model {
         return profileImageUrl;
     }
 
+    public String getTwitterTag() {
+        return twitterTag;
+    }
+
+    public String getOriginalProfileImageUrl() {
+        return originalProfileImageUrl;
+    }
+
     public User(JSONObject jsonObject) {
 
         try {
             userId = jsonObject.getString("id_str");
             name = jsonObject.getString("name");
-            profileImageUrl = jsonObject.getString("profile_image_url");
+            twitterTag = jsonObject.getString("screen_name");
+
+            String normalImageUrl = jsonObject.getString("profile_image_url");
+            profileImageUrl = constructBiggerImageUrlFrom(normalImageUrl);
+            originalProfileImageUrl = constructOriginalImageUrlFrom(normalImageUrl);
+
             tagline = jsonObject.getString("description");
             friendsCount = jsonObject.getInt("friends_count");
             followersCount = jsonObject.getInt("followers_count");
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private String constructOriginalImageUrlFrom(String normalImageUrl) {
+        return normalImageUrl.replace("_normal", "");
+    }
+
+    private String constructBiggerImageUrlFrom(String normalImageUrl) {
+        return normalImageUrl.replace("_normal", "_bigger");
     }
 }

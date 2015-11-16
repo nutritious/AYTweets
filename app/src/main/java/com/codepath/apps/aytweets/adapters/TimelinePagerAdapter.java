@@ -32,7 +32,7 @@ public class TimelinePagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         TimelineFragment fragment = timelineFragments.get(position);
         if (fragment == null) {
-            fragment = TimelineFragment.newInstance(TimelineType.values()[position + 1]);
+            fragment = TimelineFragment.newInstance(TimelineType.values()[position + 1], null);
             timelineFragments.put(position, fragment);
         }
 

@@ -8,10 +8,10 @@
         android:id="@+id/userNameTextView"
         android:contentDescription="@string/timeline_item_username_desription"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/userImageView"
+        android:layout_toRightOf="@+id/profileUserImageView"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/userImageView"
+        android:layout_alignBottom="@+id/profileUserImageView"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:textStyle="bold" />
@@ -38,7 +38,7 @@
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/userImageView"
+        android:id="@+id/profileUserImageView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

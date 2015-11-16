@@ -48,14 +48,18 @@
                     android:scheme="oauth" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.TimelineActivity"
-                  android:launchMode="singleTop">
+        <activity
+            android:name=".activities.TimelineActivity"
+            android:launchMode="singleTop" >
         </activity>
-        <activity android:name=".activities.ComposeTweetActivity"
-            android:label="@string/tweet_action_bar_title">
+        <activity
+            android:name=".activities.ComposeTweetActivity"
+            android:label="@string/tweet_action_bar_title" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.codepath.apps.aytweets.activities.TimelineActivity" />
+        </activity>
+        <activity android:name=".activities.ProfileActivity" >
         </activity>
     </application>
 
