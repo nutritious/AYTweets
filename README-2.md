@@ -1,6 +1,6 @@
-# Week Three Assignment - Simple Twitter Client - **AYTweets**
+# Week Four Assignment - Extended Twitter Client - **AYTweets**
 
-**AYTweets** is an android Twitter client  that supports viewing a Twitter timeline and composing a new tweet.
+**AYTweets** is an android Twitter client  that supports viewing a Twitter timeline, composing a new tweet, see user profiles and mentions timeline.
 
 Submitted by: **Andrey Yegorov**
 
@@ -9,28 +9,29 @@ Time spent: **10** hours spent in total
 ## User Stories
 
 The following **required** functionality is completed:
+  
+* [X] Includes all required user stories from Week 3 Twitter Client
+* [X] User can switch between Timeline and Mention views using tabs.
+  - User can view their home timeline tweets.
+  - User can view the recent mentions of their username.
+* [X] User can navigate to view their own profile
+  - User can see picture, tagline, # of followers, # of following, and tweets on their profile.
+* [X] User can click on the profile image in any tweet to see another user's profile.
+  - User can see picture, tagline, # of followers, # of following, and tweets of clicked user.
+  - Profile view should include that user's timeline
+* [X] User can infinitely paginate any of these timelines (home, mentions, user) by scrolling to the bottom
 
-* [X] User can sign in to Twitter using OAuth login
-* [X] User can view the tweets from their home timeline
-  - User should be displayed the username, name, and body for each tweet
-  - User should be displayed the relative timestamp for each tweet "8m", "7h"
-  - User can view more tweets as they scroll with infinite pagination
-* [X] User can compose a new tweet:
-  - User can click a “Compose” icon in the Action Bar on the top right
-  - User can then enter a new tweet and post this to twitter
-  - User is taken back to home timeline with new tweet visible in timeline
 
 The following **additional** features are implemented:
 
-* [X] Advanced: While composing a tweet, user can see a character counter with characters remaining for tweet out of 140
-* [X] Advanced: Links in tweets are clickable and will launch the web browser (see autolink)
-* [X] Advanced: User can refresh tweets timeline by pulling down to refresh (i.e pull-to-refresh)
+* [X] Advanced: Robust error handling, check if internet is available, handle error cases, network failures
+* [X] Advanced: When a network request is sent, user sees an indeterminate progress indicator
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-![Video Walkthrough](demo//AndroidTwitterDemo.gif)
+![Video Walkthrough](demo//AndroidTwitterDemo2.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
