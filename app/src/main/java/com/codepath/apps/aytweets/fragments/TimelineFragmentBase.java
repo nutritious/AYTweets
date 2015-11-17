@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.codepath.apps.aytweets.R;
 import com.codepath.apps.aytweets.adapters.EndlessScrollListener;
@@ -24,13 +25,17 @@ import java.util.ArrayList;
  */
 public abstract class TimelineFragmentBase extends Fragment {
 
-    // Data
+    // Network
     protected final TwitterClient client = TwitterApplication.getRestClient();
 
     // UI
     protected SwipeRefreshLayout swipeContainer;
     protected ListView tweetsListView;
     protected TweetsTimelineAdapter tweetsTimelineAdapter;
+    ProgressBar progressBarFooter;
+
+
+    // Data
     protected ArrayList<Tweet> tweets;
     protected TimelineType timelineType = TimelineType.Undefined;
 
@@ -56,6 +61,14 @@ public abstract class TimelineFragmentBase extends Fragment {
         View parentView = inflater.inflate(R.layout.fragment_timeline, container, false);
 
         tweetsListView = (ListView) parentView.findViewById(R.id.tweetsListView);
+
+        View footer = inflater.inflate(R.layout.footer_progress, container);
+        // Find the progressbar within footer
+        progressBarFooter = (ProgressBar) footer.findViewById(R.id.pbFooterLoading);
+        // Q: somehow setting the footer crashes the app with
+        // java.lang.ClassCastException: android.widget.LinearLayout$LayoutParams cannot be cast to android.widget.AbsListView$LayoutParams
+//        tweetsListView.addFooterView(progressBarFooter);
+
         tweetsTimelineAdapter = new TweetsTimelineAdapter(getActivity(), tweets);
         tweetsListView.setAdapter(tweetsTimelineAdapter);
 
@@ -96,6 +109,16 @@ public abstract class TimelineFragmentBase extends Fragment {
 
         timelineType = TimelineType.values()[getArguments().getInt("Type")];
         tweets = new ArrayList<Tweet>();
+    }
+
+    // Show progress
+    public void showProgressBar() {
+        progressBarFooter.setVisibility(View.VISIBLE);
+    }
+
+    // Hide progress
+    public void hideProgressBar() {
+        progressBarFooter.setVisibility(View.GONE);
     }
 
 }

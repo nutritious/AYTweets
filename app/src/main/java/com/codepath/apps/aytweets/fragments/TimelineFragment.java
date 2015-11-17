@@ -45,16 +45,20 @@ public class TimelineFragment extends TimelineFragmentBase {
 
     @Override
     public boolean fetchTimelineMore() {
+        showProgressBar();
+
         return client.getTimelineMore(timelineType, extraParams, new TwitterTimelineResponseHandler()
         {
             @Override
             public void onSuccess(ArrayList<Tweet> newTweets) {
                 tweets.addAll(newTweets);
                 tweetsTimelineAdapter.notifyDataSetChanged();
+                hideProgressBar();
             }
 
             @Override
             public void onFailure(int statusCode, String errorMessage) {
+                hideProgressBar();
                 Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_SHORT).show();
             }
         });

@@ -1,5 +1,6 @@
 package com.codepath.apps.aytweets.activities;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -53,17 +54,22 @@ public class TimelineActivity extends AppCompatActivity {
 
     public void onUserProfile(MenuItem item) {
 
+        final ProgressDialog progressDialog = showLoadingSpinner();
+
         client.getUserProfile(new TwitterAccountResponseHandler() {
             @Override
             public void onSuccess(User user) {
                 Intent intent = new Intent(TimelineActivity.this, ProfileActivity.class);
                 intent.putExtra("user", user);
                 startActivity(intent);
+
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(int statusCode, String errorMessage) {
                 Toast.makeText(TimelineActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
             }
         });
     }
@@ -72,18 +78,32 @@ public class TimelineActivity extends AppCompatActivity {
         if (requestCode == COMPOSE_TWEET_REQUEST_CODE && resultCode == RESULT_OK) {
             String tweetBody = data.getStringExtra("tweetBody");
 
+            final ProgressDialog progressDialog = showLoadingSpinner();
+
             client.postTweet(tweetBody, new TwitterPostResponseHandler() {
                 @Override
                 public void onSuccess(long tweetId) {
                     timelinePagerAdapter.getItemByTimelineType(TimelineType.Home).fetchTimelineRefreshAfterTweet(tweetId);
+                    progressDialog.dismiss();
                 }
 
                 @Override
                 public void onFailure(int statusCode, String errorMessage) {
+                    progressDialog.dismiss();
                     Toast.makeText(TimelineActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                 }
             });
         }
+    }
+
+    private ProgressDialog showLoadingSpinner() {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+
+        progressDialog.show();
+
+        return progressDialog;
     }
 
 }
